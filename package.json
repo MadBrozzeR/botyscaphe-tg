@@ -1,0 +1,29 @@
+{
+  "name": "botyscaphe-tg",
+  "version": "0.0.1",
+  "description": "Telegram Bot Api implementation by MadBrozzeR",
+  "main": "build/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MadBrozzeR/botyscaphe-tg.git"
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "api"
+  ],
+  "author": "MadBrozzeR",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MadBrozzeR/botyscaphe-tg/issues"
+  },
+  "homepage": "https://github.com/MadBrozzeR/botyscaphe-tg#readme",
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "typescript": "^5.8.2"
+  }
+}
