@@ -7,6 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc"
   },
+  "bin": {
+    "webhook": "./bin/webhook.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MadBrozzeR/botyscaphe-tg.git"
