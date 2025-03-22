@@ -29,8 +29,6 @@ const PARAMS = {
   params: getParams(process.argv),
 };
 
-console.log(PARAMS);
-
 const PARAMS_MAP = {
   url: 'url',
   cert: function (values) {
@@ -70,6 +68,8 @@ function getRequestParams (params) {
       }
     }
   }
+
+  return result;
 }
 
 function getParamsFromJson () {
