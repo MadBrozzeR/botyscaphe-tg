@@ -1,6 +1,7 @@
 import type { IncomingMessage } from 'http';
 import https from 'https';
 import type { Update } from './types.in';
+import type { SendMessageData } from './types.out';
 
 import { validateRequest, collectData } from './utils';
 import { API_HOST } from './constants';
@@ -53,5 +54,9 @@ export class Bot {
         .on('error', reject)
         .end(message);
     });
+  }
+
+  sendMessage (message: SendMessageData) {
+    return this.send('sendMessage', JSON.stringify(message));
   }
 }
