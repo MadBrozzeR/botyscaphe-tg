@@ -1,43 +1,44 @@
 /* TODO */
-type BusinessConnection = {};
-type BusinessMessagesDeleted = {};
-type MessageReactionUpdated = {};
-type MessageReactionCountUpdated = {};
-type InlineQuery = {};
-type ChosenInlineResult = {};
-type ShippingQuery = {};
-type PreCheckoutQuery = {};
-type PaidMediaPurchased = {};
-type Poll = {};
-type PollAnswer = {};
-type ChatMemberUpdated = {};
-type ChatJoinRequest = {};
-type ChatBoostUpdated = {};
-type ChatBoostRemoved = {};
+export type BusinessConnection = {};
+export type BusinessMessagesDeleted = {};
+export type MessageReactionUpdated = {};
+export type MessageReactionCountUpdated = {};
+export type InlineQuery = {};
+export type ChosenInlineResult = {};
+export type ShippingQuery = {};
+export type PreCheckoutQuery = {};
+export type PaidMediaPurchased = {};
+export type Poll = {};
+export type PollAnswer = {};
+export type ChatMemberUpdated = {};
+export type ChatJoinRequest = {};
+export type ChatBoostUpdated = {};
+export type ChatBoostRemoved = {};
 
-type ExternalReplyInfo = {};
-type PassportData = {};
-type ProximityAlertTriggered = {};
-type ChatBoostAdded = {};
-type ChatBackground = {};
-type ForumTopicCreated = {};
-type ForumTopicEdited = {};
-type ForumTopicClosed = {};
-type ForumTopicReopened = {};
-type GeneralForumTopicHidden = {};
-type GeneralForumTopicUnhidden = {};
-type GiveawayCreated = {};
-type Giveaway = {};
-type GiveawayWinners = {};
-type GiveawayCompleted = {};
-type VideoChatScheduled = {};
-type VideoChatStarted = {};
-type VideoChatEnded = {};
-type VideoChatParticipantsInvited = {};
-type WebAppData = {};
+export type ExternalReplyInfo = {};
+export type PassportData = {};
+export type ProximityAlertTriggered = {};
+export type ChatBoostAdded = {};
+export type ChatBackground = {};
+export type ForumTopicCreated = {};
+export type ForumTopicEdited = {};
+export type ForumTopicClosed = {};
+export type ForumTopicReopened = {};
+export type GeneralForumTopicHidden = {};
+export type GeneralForumTopicUnhidden = {};
+export type GiveawayCreated = {};
+export type Giveaway = {};
+export type GiveawayWinners = {};
+export type GiveawayCompleted = {};
+export type VideoChatScheduled = {};
+export type VideoChatStarted = {};
+export type VideoChatEnded = {};
+export type VideoChatParticipantsInvited = {};
+export type WebAppData = {};
+export type CallbackGame = any;
 /* /TODO */
 
-type User = {
+export type User = {
   id: number;
   is_bot: boolean;
   first_name: string;
@@ -53,7 +54,7 @@ type User = {
   has_main_web_app?: boolean;
 };
 
-type Chat = {
+export type Chat = {
   id: number;
   type: string;
   title?: string;
@@ -63,26 +64,26 @@ type Chat = {
   is_forum?: true;
 };
 
-type MessageOriginUser = {
+export type MessageOriginUser = {
   type: string;
   date: number;
   sender_user: User;
 };
 
-type MessageOriginHiddenUser = {
+export type MessageOriginHiddenUser = {
   type: string;
   date: number;
   sender_user_name: string;
 };
 
-type MessageOriginChat = {
+export type MessageOriginChat = {
   type: string;
   date: number;
   sender_chat: Chat;
   author_signature?: string;
 };
 
-type MessageOriginChannel = {
+export type MessageOriginChannel = {
   type: string;
   date: number;
   chat: Chat;
@@ -90,9 +91,9 @@ type MessageOriginChannel = {
   author_signature?: string;
 };
 
-type MessageOrigin = MessageOriginUser | MessageOriginHiddenUser | MessageOriginChat | MessageOriginChannel;
+export type MessageOrigin = MessageOriginUser | MessageOriginHiddenUser | MessageOriginChat | MessageOriginChannel;
 
-type MessageEntityType =  'mention' | 'hashtag' | 'cashtag' | 'bot_command' | 'url' | 'email'
+export type MessageEntityType =  'mention' | 'hashtag' | 'cashtag' | 'bot_command' | 'url' | 'email'
   | 'phone_number' | 'bold' | 'italic' | 'underline' | 'strikethrough' | 'spoiler' | 'blockquote'
   | 'expandable_blockquote' | 'code' | 'pre' | 'text_link' | 'text_mention' | 'custom_emoji';
 
@@ -106,14 +107,14 @@ export type MessageEntity = {
   custom_emoji_id?: string;
 };
 
-type TextQuote = {
+export type TextQuote = {
   text: string;
   entities?: Array<MessageEntity>;
   position: number;
   is_manual?: true;
 };
 
-type Story = {
+export type Story = {
   id: number;
   chat: Chat;
 };
@@ -126,7 +127,7 @@ export type LinkPreviewOptions = {
   show_above_text?: boolean;
 };
 
-type PhotoSize = {
+export type PhotoSize = {
   file_id: string;
   file_unique_id: string;
   width: number;
@@ -134,7 +135,7 @@ type PhotoSize = {
   file_size?: number;
 };
 
-type Animation = {
+export type Animation = {
   file_id: string;
   file_unique_id: string;
   width: number;
@@ -146,7 +147,7 @@ type Animation = {
   file_size?: number;
 };
 
-type Audio = {
+export type Audio = {
   file_id: string;
   file_unique_id: string;
   duration: number;
@@ -158,7 +159,7 @@ type Audio = {
   thumbnail?: PhotoSize;
 };
 
-type Video = {
+export type Video = {
   file_id: string;
   file_unique_id: string;
   width: number;
@@ -172,7 +173,7 @@ type Video = {
   file_size?: number;
 };
 
-type Document = {
+export type Document = {
   file_id: string;
   file_unique_id: string;
   thumbnail?: PhotoSize;
@@ -181,45 +182,45 @@ type Document = {
   file_size?: number;
 };
 
-type PaidMediaPreview = {
+export type PaidMediaPreview = {
   type: string;
   width?: number;
   height?: number;
   duration?: number;
 };
 
-type PaidMediaPhoto = {
+export type PaidMediaPhoto = {
   type: string;
   photo: Array<PhotoSize>;
 };
 
-type PaidMediaVideo = {
+export type PaidMediaVideo = {
   type: string;
   video: Video;
 };
 
-type PaidMedia = PaidMediaPreview | PaidMediaPhoto | PaidMediaVideo;
+export type PaidMedia = PaidMediaPreview | PaidMediaPhoto | PaidMediaVideo;
 
-type PaidMediaInfo = {
+export type PaidMediaInfo = {
   star_count: number;
   paid_media: Array<PaidMedia>;
 };
 
-type File = {
+export type File = {
   file_id: string;
   file_unique_id: string;
   file_size?: number;
   file_path?: string;
 };
 
-type MaskPosition = {
+export type MaskPosition = {
   point: string;
   x_shift: number;
   y_shift: number;
   scale: number;
 };
 
-type Sticker = {
+export type Sticker = {
   file_id: string;
   file_unique_id: string;
   type: string;
@@ -237,7 +238,7 @@ type Sticker = {
   file_size?: number;
 };
 
-type VideoNote = {
+export type VideoNote = {
   file_id: string;
   file_unique_id: string;
   length: number;
@@ -246,7 +247,7 @@ type VideoNote = {
   file_size?: number;
 };
 
-type Voice = {
+export type Voice = {
   file_id: string;
   file_unique_id: string;
   duration: number;
@@ -254,7 +255,7 @@ type Voice = {
   file_size?: number;
 };
 
-type Contact = {
+export type Contact = {
   phone_number: string;
   first_name: string;
   last_name?: string;
@@ -262,12 +263,12 @@ type Contact = {
   vcard?: string;
 };
 
-type Dice = {
+export type Dice = {
   emoji: string;
   value: number;
 };
 
-type Game = {
+export type Game = {
   title: string;
   description: string;
   photo: Array<PhotoSize>;
@@ -276,7 +277,7 @@ type Game = {
   animation?: Animation;
 };
 
-type Location = {
+export type Location = {
   latitude: number;
   longitude: number;
   horizontal_accuracy?: number;
@@ -285,7 +286,7 @@ type Location = {
   proximity_alert_radius?: number;
 };
 
-type Venue = {
+export type Venue = {
   location: Location;
   title: string;
   address: string;
@@ -295,19 +296,19 @@ type Venue = {
   google_place_type?: string;
 };
 
-type MessageAutoDeleteTimerChanged = {
+export type MessageAutoDeleteTimerChanged = {
   message_auto_delete_time: number;
 };
 
-type InaccessibleMessage = {
+export type InaccessibleMessage = {
   chat: Chat;
   message_id: number;
   date: number;
 };
 
-type MaybeInaccessibleMessage = Message | InaccessibleMessage;
+export type MaybeInaccessibleMessage = Message | InaccessibleMessage;
 
-type Invoice = {
+export type Invoice = {
   title: string;
   description: string;
   start_parameter: string;
@@ -315,7 +316,7 @@ type Invoice = {
   total_amount: number;
 };
 
-type ShippingAddress = {
+export type ShippingAddress = {
   country_code: string;
   state: string;
   city: string;
@@ -324,14 +325,14 @@ type ShippingAddress = {
   post_code: string;
 };
 
-type OrderInfo = {
+export type OrderInfo = {
   name?: string;
   phone_number?: string;
   email?: string;
   shipping_address?: ShippingAddress;
 };
 
-type SuccessfulPayment = {
+export type SuccessfulPayment = {
   currency: string;
   total_amount: number;
   invoice_payload: string;
@@ -344,7 +345,7 @@ type SuccessfulPayment = {
   provider_payment_charge_id: string;
 };
 
-type RefundedPayment = {
+export type RefundedPayment = {
   currency: string;
   total_amount: number;
   invoice_payload: string;
@@ -352,7 +353,7 @@ type RefundedPayment = {
   provider_payment_charge_id?: string;
 };
 
-type SharedUsers = {
+export type SharedUsers = {
   user_id: number;
   first_name?: string;
   last_name?: string;
@@ -360,12 +361,12 @@ type SharedUsers = {
   photo?: Array<PhotoSize>;
 };
 
-type UsersShared = {
+export type UsersShared = {
   request_id: number;
   users: Array<SharedUsers>;
 };
 
-type ChatShared = {
+export type ChatShared = {
   request_id: number;
   chat_id: number;
   title?: string;
@@ -373,7 +374,7 @@ type ChatShared = {
   photo?: Array<PhotoSize>;
 };
 
-type WriteAccessAllowed = {
+export type WriteAccessAllowed = {
   from_request?: boolean;
   web_app_name?: string;
   from_attachment_menu?: boolean;
@@ -383,14 +384,14 @@ export type WebAppInfo = {
   url: string;
 };
 
-type LoginUrl = {
+export type LoginUrl = {
   url: string;
   forward_text?: string;
   bot_username?: string;
   request_write_access?: boolean;
 };
 
-type SwitchInlineQueryChosenChat = {
+export type SwitchInlineQueryChosenChat = {
   query?: string;
   allow_user_chats?: boolean;
   allow_bot_chats?: boolean;
@@ -398,13 +399,11 @@ type SwitchInlineQueryChosenChat = {
   allow_channel_chats?: boolean;
 };
 
-type CopyTextButton = {
+export type CopyTextButton = {
   text: string;
 };
 
-type CallbackGame = any;
-
-type InlineKeyboardButton = {
+export type InlineKeyboardButton = {
   text: string;
   url?: string;
   callback_data?: string;
@@ -422,7 +421,7 @@ export type InlineKeyboardMarkup = {
   inline_keyboard: Array<Array<InlineKeyboardButton>>;
 };
 
-type Message = {
+export type Message = {
   message_id: number;
   message_thread_id?: number;
   from?: User;
@@ -510,7 +509,7 @@ type Message = {
   reply_markup?: InlineKeyboardMarkup;
 };
 
-type CallbackQuery = {
+export type CallbackQuery = {
   id: string;
   from: User;
   message?: MaybeInaccessibleMessage;
@@ -520,7 +519,7 @@ type CallbackQuery = {
   game_short_name?: string;
 };
 
-type UpdateTypes = {
+export type UpdateTypes = {
   message: Message;
   edited_message: Message;
   channel_post: Message;
@@ -546,8 +545,8 @@ type UpdateTypes = {
   removed_chat_boost: ChatBoostRemoved;
 }
 
-export type Update = { update_id: number } & {
+export type Update<T extends keyof UpdateTypes = keyof UpdateTypes> = { update_id: number } & {
   [K in keyof UpdateTypes]: {
     [K2 in K]: UpdateTypes[K2];
   };
-}[keyof UpdateTypes];
+}[T];
