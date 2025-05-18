@@ -106,3 +106,23 @@ export type SendMessageData = {
   reply_parameters?: ReplyParameters;
   reply_markup?: ReplyMarkup;
 };
+
+export type EditMessageTextData = {
+  business_connection_id?: string;
+  chat_id?: number | string;
+  message_id?: number;
+  inline_message_id?: string;
+  text: string;
+  parse_mode?: ParseMode;
+  entities?: Array<MessageEntity>;
+  link_preview_options?: LinkPreviewOptions;
+  reply_markup?: ReplyMarkup;
+};
+
+export type EditMessageReplyMarkupData = {
+  business_connection_id?: string;
+  chat_id?: number | string;
+  message_id?: number;
+  inline_message_id?: string;
+  reply_markup?: ReplyMarkup;
+};

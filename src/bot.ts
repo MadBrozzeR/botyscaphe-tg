@@ -1,7 +1,7 @@
 import type { IncomingMessage } from 'http';
 import https from 'https';
 import type { Update } from './types.in';
-import type { SendMessageData } from './types.out';
+import type { EditMessageReplyMarkupData, EditMessageTextData, SendMessageData } from './types.out';
 
 import { validateRequest, collectData } from './utils';
 import { API_HOST } from './constants';
@@ -58,5 +58,13 @@ export class Bot {
 
   sendMessage (message: SendMessageData) {
     return this.send('sendMessage', JSON.stringify(message));
+  }
+
+  editMessage (message: EditMessageTextData) {
+    return this.send('editMessageText', JSON.stringify(message));
+  }
+
+  editMessageReplyMarkup (message: EditMessageReplyMarkupData) {
+    return this.send('editMessageReplyMarkup', JSON.stringify(message));
   }
 }
