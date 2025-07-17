@@ -1,5 +1,16 @@
 import type { MessageEntity, LinkPreviewOptions, InlineKeyboardMarkup, WebAppInfo } from './types.in';
 
+export type TGBotResponse<T = any> = {
+  ok: boolean;
+  description?: string;
+  result?: T;
+  error_code?: number;
+  parameters?: {
+    migrate_to_chat_id?: number;
+    retry_after?: number;
+  };
+};
+
 export type KeyboardButtonRequestUsers = {
   request_id: number;
   user_is_bot?: boolean;

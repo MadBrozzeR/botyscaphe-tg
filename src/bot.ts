@@ -1,7 +1,7 @@
 import type { IncomingMessage } from 'http';
 import https from 'https';
 import type { Update } from './types.in';
-import type { EditMessageReplyMarkupData, EditMessageTextData, SendMessageData } from './types.out';
+import type { EditMessageReplyMarkupData, EditMessageTextData, SendMessageData, TGBotResponse } from './types.out';
 
 import { validateRequest, collectData } from './utils';
 import { API_HOST } from './constants';
@@ -38,10 +38,10 @@ export class Bot {
     });
   }
 
-  send (action: string, message: string) {
+  send<T = any> (action: string, message: string) {
     const path = `/bot${this.options.token}/${action}`;
 
-    return new Promise(function (resolve, reject) {
+    return new Promise<TGBotResponse<T>>(function (resolve, reject) {
       https.request({
         hostname: API_HOST,
         method: 'POST',
@@ -50,21 +50,30 @@ export class Bot {
           'Content-Type': 'application/json',
           'Content-Length': Buffer.byteLength(message)
         }
-      }, resolve)
+      }, function (response) {
+        collectData(response).then(function (data) {
+          const responseData: TGBotResponse = JSON.parse(data.toString());
+          if (responseData.ok) {
+            resolve(responseData);
+          } else {
+            reject(responseData);
+          }
+        }).catch(reject);
+      })
         .on('error', reject)
         .end(message);
     });
   }
 
   sendMessage (message: SendMessageData) {
-    return this.send('sendMessage', JSON.stringify(message));
+    return this.send<SendMessageData>('sendMessage', JSON.stringify(message));
   }
 
   editMessage (message: EditMessageTextData) {
-    return this.send('editMessageText', JSON.stringify(message));
+    return this.send<EditMessageTextData>('editMessageText', JSON.stringify(message));
   }
 
   editMessageReplyMarkup (message: EditMessageReplyMarkupData) {
-    return this.send('editMessageReplyMarkup', JSON.stringify(message));
+    return this.send<EditMessageReplyMarkupData>('editMessageReplyMarkup', JSON.stringify(message));
   }
 }
