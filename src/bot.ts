@@ -1,6 +1,6 @@
 import type { IncomingMessage } from 'http';
 import https from 'https';
-import type { Update } from './types.in';
+import type { Message, Update } from './types.in';
 import type { EditMessageReplyMarkupData, EditMessageTextData, SendMessageData, TGBotResponse } from './types.out';
 
 import { validateRequest, collectData } from './utils';
@@ -66,14 +66,14 @@ export class Bot {
   }
 
   sendMessage (message: SendMessageData) {
-    return this.send<SendMessageData>('sendMessage', JSON.stringify(message));
+    return this.send<Message>('sendMessage', JSON.stringify(message));
   }
 
-  editMessage (message: EditMessageTextData) {
-    return this.send<EditMessageTextData>('editMessageText', JSON.stringify(message));
+  editMessageText (message: EditMessageTextData) {
+    return this.send<Message | true>('editMessageText', JSON.stringify(message));
   }
 
   editMessageReplyMarkup (message: EditMessageReplyMarkupData) {
-    return this.send<EditMessageReplyMarkupData>('editMessageReplyMarkup', JSON.stringify(message));
+    return this.send<Message | true>('editMessageReplyMarkup', JSON.stringify(message));
   }
 }

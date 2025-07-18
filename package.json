@@ -1,6 +1,6 @@
 {
   "name": "botyscaphe-tg",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Telegram Bot Api implementation by MadBrozzeR",
   "main": "build/index.js",
   "scripts": {
