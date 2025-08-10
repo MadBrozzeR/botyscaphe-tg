@@ -97,6 +97,59 @@ export type ForceReply = {
   selective?: boolean;
 };
 
+export type BotCommand = {
+  command: string;
+  description: string;
+};
+
+export type BotCommandScopeDefault = {
+  type: 'default';
+};
+export type BotCommandScopeAllPrivateChats = {
+  type: 'all_private_chats';
+};
+export type BotCommandScopeAllGroupChats = {
+  type: 'all_group_chats';
+};
+export type BotCommandScopeAllChatAdministrators = {
+  type: 'all_chat_administrators';
+};
+export type BotCommandScopeChat = {
+  type: 'chat';
+  chat_id: number | string;
+};
+export type BotCommandScopeChatAdministrators = {
+  type: 'chat_administrators';
+  chat_id: number | string;
+};
+export type BotCommandScopeChatMember = {
+  type: 'chat_member';
+  chat_id: number | string;
+  user_id: number;
+};
+
+export type BotCommandScope = BotCommandScopeDefault |
+  BotCommandScopeAllPrivateChats |
+  BotCommandScopeAllGroupChats |
+  BotCommandScopeAllChatAdministrators |
+  BotCommandScopeChat |
+  BotCommandScopeChatAdministrators |
+  BotCommandScopeChatMember;
+
+export type MenuButtonCommands = {
+  type: 'commands';
+};
+export type MenuButtonWebApp = {
+  type: 'web_app';
+  text: string;
+  web_app: WebAppInfo;
+};
+export type MenuButtonDefault = {
+  type: 'default';
+};
+
+export type MenuButton = MenuButtonCommands | MenuButtonWebApp | MenuButtonDefault;
+
 export type ReplyMarkup = InlineKeyboardMarkup | ReplyKeyboardMarkup | ReplyKeyboardRemove | ForceReply;
 
 // Info: https://core.telegram.org/bots/api#formatting-options
@@ -136,4 +189,29 @@ export type EditMessageReplyMarkupData = {
   message_id?: number;
   inline_message_id?: string;
   reply_markup?: ReplyMarkup;
+};
+
+export type SetMyCommandsData = {
+  commands: BotCommand[];
+  scope?: BotCommandScope;
+  language_code?: string;
+};
+
+export type DeleteMyCommandsData = {
+  scope?: BotCommandScope;
+  language_code?: string;
+};
+
+export type GetMyCommandsData = {
+  scope?: BotCommandScope;
+  language_code?: string;
+};
+
+export type SetChatMenuButtonData = {
+  chat_id?: number;
+  menu_button?: MenuButton;
+};
+
+export type GetChatMenuButtonData = {
+  chat_id?: number;
 };

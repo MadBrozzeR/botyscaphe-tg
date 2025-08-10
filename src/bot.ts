@@ -1,7 +1,7 @@
 import type { IncomingMessage } from 'http';
 import https from 'https';
-import type { Message, Update } from './types.in';
-import type { EditMessageReplyMarkupData, EditMessageTextData, SendMessageData, TGBotResponse } from './types.out';
+import type { Message, Update, User } from './types.in';
+import type * as Out from './types.out';
 
 import { validateRequest, collectData } from './utils';
 import { API_HOST } from './constants';
@@ -10,6 +10,24 @@ type Options = {
   secret?: string;
   token: string;
 };
+
+type Method = {
+  getMe: [void, User];
+  logOut: [void, true];
+  close: [void, true];
+  sendMessage: [Out.SendMessageData, Message];
+  editMessageText: [Out.EditMessageTextData, Message | true];
+  editMessageReplyMarkup: [Out.EditMessageReplyMarkupData, Message | true];
+  setMyCommands: [Out.SetMyCommandsData, true];
+  deleteMyCommands: [Out.DeleteMyCommandsData, true];
+  getMyCommands: [Out.GetMyCommandsData, Out.BotCommand[]];
+  setChatMenuButton: [Out.SetChatMenuButtonData, true];
+  getChatMenuButton: [Out.GetChatMenuButtonData, Out.MenuButton];
+};
+type MethodNoRequestData = {
+  [K in keyof Method as Method[K][0] extends void ? K : never]: Method[K];
+};
+type MethodWithRequestData = Omit<Method, keyof MethodNoRequestData>;
 
 export class Bot {
   options: Options;
@@ -41,7 +59,7 @@ export class Bot {
   send<T = any> (action: string, message: string) {
     const path = `/bot${this.options.token}/${action}`;
 
-    return new Promise<TGBotResponse<T>>(function (resolve, reject) {
+    return new Promise<Out.TGBotResponse<T>>(function (resolve, reject) {
       https.request({
         hostname: API_HOST,
         method: 'POST',
@@ -52,7 +70,7 @@ export class Bot {
         }
       }, function (response) {
         collectData(response).then(function (data) {
-          const responseData: TGBotResponse = JSON.parse(data.toString());
+          const responseData: Out.TGBotResponse = JSON.parse(data.toString());
           if (responseData.ok) {
             resolve(responseData);
           } else {
@@ -65,15 +83,23 @@ export class Bot {
     });
   }
 
-  sendMessage (message: SendMessageData) {
-    return this.send<Message>('sendMessage', JSON.stringify(message));
+  useMethod<K extends keyof MethodNoRequestData> (action: K):
+    Promise<Out.TGBotResponse<MethodNoRequestData[K][1]>>;
+  useMethod<K extends keyof MethodWithRequestData> (action: K, message: MethodWithRequestData[K][0]):
+    Promise<Out.TGBotResponse<MethodWithRequestData[K][1]>>;
+  useMethod<K extends keyof Method> (action: K, message?: Method[K][0]) {
+    return this.send<Method[K][1]>(action, message ? JSON.stringify(message) : '');
   }
 
-  editMessageText (message: EditMessageTextData) {
-    return this.send<Message | true>('editMessageText', JSON.stringify(message));
+  sendMessage (message: Out.SendMessageData) {
+    return this.useMethod('sendMessage', message);
   }
 
-  editMessageReplyMarkup (message: EditMessageReplyMarkupData) {
-    return this.send<Message | true>('editMessageReplyMarkup', JSON.stringify(message));
+  editMessageText (message: Out.EditMessageTextData) {
+    return this.useMethod('editMessageText', message);
+  }
+
+  editMessageReplyMarkup (message: Out.EditMessageReplyMarkupData) {
+    return this.useMethod('editMessageReplyMarkup', message);
   }
 }

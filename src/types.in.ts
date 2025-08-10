@@ -519,34 +519,119 @@ export type CallbackQuery = {
   game_short_name?: string;
 };
 
-export type UpdateTypes = {
+export type MessageUpdate = {
+  update_id: number;
   message: Message;
+};
+export type EditedMessageUpdate = {
+  update_id: number;
   edited_message: Message;
+};
+export type ChannelPostUpdate = {
+  update_id: number;
   channel_post: Message;
+};
+export type EditedChannelPostUpdate = {
+  update_id: number;
   edited_channel_post: Message;
+};
+export type BusinessConnectionUpdate = {
+  update_id: number;
   business_connection: BusinessConnection;
+};
+export type BusinessMessageUpdate = {
+  update_id: number;
   business_message: Message;
+};
+export type EditedBusinessMessageUpdate = {
+  update_id: number;
   edited_business_message: Message;
+};
+export type DeletedBusinessMessageUpdate = {
+  update_id: number;
   deleted_business_messages: BusinessMessagesDeleted;
+};
+export type MessageReactionUpdate = {
+  update_id: number;
   message_reaction: MessageReactionUpdated;
+};
+export type MessageReactionCountUpdate = {
+  update_id: number;
   message_reaction_count: MessageReactionCountUpdated;
+};
+export type InlineQueryUpdate = {
+  update_id: number;
   inline_query: InlineQuery;
+};
+export type ChosenInlineResultUpdate = {
+  update_id: number;
   chosen_inline_result: ChosenInlineResult;
+};
+export type CallbackQueryUpdate = {
+  update_id: number;
   callback_query: CallbackQuery;
+};
+export type ShippingQueryUpdate = {
+  update_id: number;
   shipping_query: ShippingQuery;
+};
+export type PreCheckoutQueryUpdate = {
+  update_id: number;
   pre_checkout_query: PreCheckoutQuery;
+};
+export type PurchasedPaidMediaUpdate = {
+  update_id: number;
   purchased_paid_media: PaidMediaPurchased;
+};
+export type PollUpdate = {
+  update_id: number;
   poll: Poll;
+};
+export type PollAnswerUpdate = {
+  update_id: number;
   poll_answer: PollAnswer;
+};
+export type MyChatMemberUpdate = {
+  update_id: number;
   my_chat_member: ChatMemberUpdated;
+};
+export type ChatMemberUpdate = {
+  update_id: number;
   chat_member: ChatMemberUpdated;
+};
+export type ChatJoinRequestUpdate = {
+  update_id: number;
   chat_join_request: ChatJoinRequest;
+};
+export type ChatBoostUpdate = {
+  update_id: number;
   chat_boost: ChatBoostUpdated;
+};
+export type RemovedChatBoostUpdate = {
+  update_id: number;
   removed_chat_boost: ChatBoostRemoved;
-}
+};
 
-export type Update<T extends keyof UpdateTypes = keyof UpdateTypes> = { update_id: number } & {
-  [K in keyof UpdateTypes]: {
-    [K2 in K]: UpdateTypes[K2];
-  };
-}[T];
+export type Update = MessageUpdate |
+  EditedMessageUpdate |
+  ChannelPostUpdate |
+  EditedChannelPostUpdate |
+  BusinessConnectionUpdate |
+  BusinessMessageUpdate |
+  EditedBusinessMessageUpdate |
+  DeletedBusinessMessageUpdate |
+  MessageReactionUpdate |
+  MessageReactionCountUpdate |
+  InlineQueryUpdate |
+  ChosenInlineResultUpdate |
+  CallbackQueryUpdate |
+  ShippingQueryUpdate |
+  PreCheckoutQueryUpdate |
+  PurchasedPaidMediaUpdate |
+  PollUpdate |
+  PollAnswerUpdate |
+  MyChatMemberUpdate |
+  ChatMemberUpdate |
+  ChatJoinRequestUpdate |
+  ChatBoostUpdate |
+  RemovedChatBoostUpdate;
