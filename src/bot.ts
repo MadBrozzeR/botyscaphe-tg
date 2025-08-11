@@ -23,6 +23,12 @@ type Method = {
   getMyCommands: [Out.GetMyCommandsData, Out.BotCommand[]];
   setChatMenuButton: [Out.SetChatMenuButtonData, true];
   getChatMenuButton: [Out.GetChatMenuButtonData, Out.MenuButton];
+  forwardMessage: [Out.ForwardMessageData, Message];
+  forwardMessages: [Out.ForwardMessagesData, Out.MessageId[]];
+  copyMessage: [Out.CopyMessageData, Out.MessageId];
+  copyMessages: [Out.CopyMessagesData, Out.MessageId[]];
+  sendPhoto: [Out.SendPhotoData, Message];
+  sendAudio: [Out.SendAudioData, Message];
 };
 type MethodNoRequestData = {
   [K in keyof Method as Method[K][0] extends void ? K : never]: Method[K];

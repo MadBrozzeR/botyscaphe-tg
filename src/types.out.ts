@@ -1,5 +1,11 @@
 import type { MessageEntity, LinkPreviewOptions, InlineKeyboardMarkup, WebAppInfo } from './types.in';
 
+export type MessageId = {
+  message_id: number; // Unique message identifier. In specific instances (e.g., message containing a video sent to a big chat), the server might automatically schedule a message instead of sending it immediately. In such cases, this field will be 0 and the relevant message will be unusable until it is actually sent
+};
+
+export type InputFile = any;
+
 export type TGBotResponse<T = any> = {
   ok: boolean;
   description?: string;
@@ -214,4 +220,88 @@ export type SetChatMenuButtonData = {
 
 export type GetChatMenuButtonData = {
   chat_id?: number;
+};
+
+export type ForwardMessageData = {
+  chat_id: number | string; // Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+  message_thread_id?: number; // Optional	Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
+  from_chat_id: number | string; // Unique identifier for the chat where the original message was sent (or channel username in the format @channelusername)
+  video_start_timestamp?: number; // Optional	New start timestamp for the forwarded video in the message
+  disable_notification?: boolean; // Optional	Sends the message silently. Users will receive a notification with no sound.
+  protect_content?: boolean; // Optional	Protects the contents of the forwarded message from forwarding and saving
+  message_id: number; // Message identifier in the chat specified in from_chat_id
+};
+
+export type ForwardMessagesData = {
+  chat_id: number | string; // Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+  message_thread_id?: number; // Optional	Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
+  from_chat_id: number | string; // Unique identifier for the chat where the original messages were sent (or channel username in the format @channelusername)
+  message_ids: number[]; // A JSON-serialized list of 1-100 identifiers of messages in the chat from_chat_id to forward. The identifiers must be specified in a strictly increasing order.
+  disable_notification?: boolean; // Optional	Sends the messages silently. Users will receive a notification with no sound.
+  protect_content?: boolean; // Optional	Protects the contents of the forwarded messages from forwarding and saving
+};
+
+export type CopyMessageData = {
+  chat_id: number | string; // Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+  message_thread_id?: number; // Optional	Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
+  from_chat_id: number | string; // Unique identifier for the chat where the original message was sent (or channel username in the format @channelusername)
+  message_id: number; // Message identifier in the chat specified in from_chat_id
+  video_start_timestamp?: number; // Optional	New start timestamp for the copied video in the message
+  caption?: string; // Optional	New caption for media, 0-1024 characters after entities parsing. If not specified, the original caption is kept
+  parse_mode?: string; // Optional	Mode for parsing entities in the new caption. See formatting options for more details.
+  caption_entities?: MessageEntity[]; // Optional	A JSON-serialized list of special entities that appear in the new caption, which can be specified instead of parse_mode
+  show_caption_above_media?: boolean; // Optional	Pass true, if the caption must be shown above the message media. Ignored if a new caption isn't specified.
+  disable_notification?: boolean; // Optional	Sends the message silently. Users will receive a notification with no sound.
+  protect_content?: boolean; // Optional	Protects the contents of the sent message from forwarding and saving
+  allow_paid_broadcast?: boolean; // Optional	Pass true to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
+  reply_parameters?: ReplyParameters; // Optional	Description of the message to reply to
+  reply_markup?: ReplyMarkup; // Optional	Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove a reply keyboard or to force a reply from the user
+};
+
+export type CopyMessagesData = {
+  chat_id: number | string; // Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+  message_thread_id?: number; // Optional	Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
+  from_chat_id: number | string; // Unique identifier for the chat where the original messages were sent (or channel username in the format @channelusername)
+  message_ids: number[]; // A JSON-serialized list of 1-100 identifiers of messages in the chat from_chat_id to copy. The identifiers must be specified in a strictly increasing order.
+  disable_notification?: boolean; // Optional	Sends the messages silently. Users will receive a notification with no sound.
+  protect_content?: boolean; // Optional	Protects the contents of the sent messages from forwarding and saving
+  remove_caption?: boolean; // Optional	Pass true to copy the messages without their captions
+};
+
+export type SendPhotoData = {
+  business_connection_id?: string; // Optional	Unique identifier of the business connection on behalf of which the message will be sent
+  chat_id: number | string; // Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+  message_thread_id?: number; // Optional	Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
+  photo: InputFile | string; // Photo to send. Pass a file_id as String to send a photo that exists on the Telegram servers (recommended), pass an HTTP URL as a String for Telegram to get a photo from the Internet, or upload a new photo using multipart/form-data. The photo must be at most 10 MB in size. The photo's width and height must not exceed 10000 in total. Width and height ratio must be at most 20. More information on Sending Files »
+  caption?: string; // Optional	Photo caption (may also be used when resending photos by file_id), 0-1024 characters after entities parsing
+  parse_mode?: string; // Optional	Mode for parsing entities in the photo caption. See formatting options for more details.
+  caption_entities?: MessageEntity[]; // Optional	A JSON-serialized list of special entities that appear in the caption, which can be specified instead of parse_mode
+  show_caption_above_media?: boolean; // Optional	Pass true, if the caption must be shown above the message media
+  has_spoiler?: boolean; // Optional	Pass true if the photo needs to be covered with a spoiler animation
+  disable_notification?: boolean; // Optional	Sends the message silently. Users will receive a notification with no sound.
+  protect_content?: boolean; // Optional	Protects the contents of the sent message from forwarding and saving
+  allow_paid_broadcast?: boolean; // Optional	Pass true to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
+  message_effect_id?: string; // Optional	Unique identifier of the message effect to be added to the message; for private chats only
+  reply_parameters?: ReplyParameters; // Optional	Description of the message to reply to
+  reply_markup?: ReplyMarkup; // Optional	Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove a reply keyboard or to force a reply from the user
+};
+
+export type SendAudioData = {
+  business_connection_id?: string; // Optional	Unique identifier of the business connection on behalf of which the message will be sent
+  chat_id: number | string; // Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+  message_thread_id?: number; // Optional	Unique identifier for the target message thread (topic) of the forum; for forum supergroups only
+  audio: InputFile | string; // Audio file to send. Pass a file_id as String to send an audio file that exists on the Telegram servers (recommended), pass an HTTP URL as a String for Telegram to get an audio file from the Internet, or upload a new one using multipart/form-data. More information on Sending Files »
+  caption?: string; // Optional	Audio caption, 0-1024 characters after entities parsing
+  parse_mode?: string; // Optional	Mode for parsing entities in the audio caption. See formatting options for more details.
+  caption_entities?: MessageEntity[]; // Optional	A JSON-serialized list of special entities that appear in the caption, which can be specified instead of parse_mode
+  duration?: number; // Optional	Duration of the audio in seconds
+  performer?: string; // Optional	Performer
+  title?: string; // Optional	Track name
+  thumbnail?: InputFile | string; // Optional	Thumbnail of the file sent; can be ignored if thumbnail generation for the file is supported server-side. The thumbnail should be in JPEG format and less than 200 kB in size. A thumbnail's width and height should not exceed 320. Ignored if the file is not uploaded using multipart/form-data. Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>. More information on Sending Files »
+  disable_notification?: boolean; // Optional	Sends the message silently. Users will receive a notification with no sound.
+  protect_content?: boolean; // Optional	Protects the contents of the sent message from forwarding and saving
+  allow_paid_broadcast?: boolean; // Optional	Pass true to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
+  message_effect_id?: string; // Optional	Unique identifier of the message effect to be added to the message; for private chats only
+  reply_parameters?: ReplyParameters; // Optional	Description of the message to reply to
+  reply_markup?: ReplyMarkup; // Optional	Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove a reply keyboard or to force a reply from the user
 };
