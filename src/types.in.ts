@@ -1,43 +1,3 @@
-/* TODO */
-export type BusinessConnection = {};
-export type BusinessMessagesDeleted = {};
-export type MessageReactionUpdated = {};
-export type MessageReactionCountUpdated = {};
-export type InlineQuery = {};
-export type ChosenInlineResult = {};
-export type ShippingQuery = {};
-export type PreCheckoutQuery = {};
-export type PaidMediaPurchased = {};
-export type Poll = {};
-export type PollAnswer = {};
-export type ChatMemberUpdated = {};
-export type ChatJoinRequest = {};
-export type ChatBoostUpdated = {};
-export type ChatBoostRemoved = {};
-
-export type ExternalReplyInfo = {};
-export type PassportData = {};
-export type ProximityAlertTriggered = {};
-export type ChatBoostAdded = {};
-export type ChatBackground = {};
-export type ForumTopicCreated = {};
-export type ForumTopicEdited = {};
-export type ForumTopicClosed = {};
-export type ForumTopicReopened = {};
-export type GeneralForumTopicHidden = {};
-export type GeneralForumTopicUnhidden = {};
-export type GiveawayCreated = {};
-export type Giveaway = {};
-export type GiveawayWinners = {};
-export type GiveawayCompleted = {};
-export type VideoChatScheduled = {};
-export type VideoChatStarted = {};
-export type VideoChatEnded = {};
-export type VideoChatParticipantsInvited = {};
-export type WebAppData = {};
-export type CallbackGame = any;
-/* /TODO */
-
 export type User = {
   id: number;
   is_bot: boolean;
@@ -518,6 +478,420 @@ export type CallbackQuery = {
   data?: string;
   game_short_name?: string;
 };
+
+export type BusinessBotRights = {
+  can_reply: true; // Optional. True, if the bot can send and edit messages in the private chats that had incoming messages in the last 24 hours
+  can_read_messages: true; // Optional. True, if the bot can mark incoming private messages as read
+  can_delete_sent_messages: true; // Optional. True, if the bot can delete messages sent by the bot
+  can_delete_all_messages: true; // Optional. True, if the bot can delete all private messages in managed chats
+  can_edit_name: true; // Optional. True, if the bot can edit the first and last name of the business account
+  can_edit_bio: true; // Optional. True, if the bot can edit the bio of the business account
+  can_edit_profile_photo: true; // Optional. True, if the bot can edit the profile photo of the business account
+  can_edit_username: true; // Optional. True, if the bot can edit the username of the business account
+  can_change_gift_settings: true; // Optional. True, if the bot can change the privacy settings pertaining to gifts for the business account
+  can_view_gifts_and_stars: true; // Optional. True, if the bot can view gifts and the amount of Telegram Stars owned by the business account
+  can_convert_gifts_to_stars: true; // Optional. True, if the bot can convert regular gifts owned by the business account to Telegram Stars
+  can_transfer_and_upgrade_gifts: true; // Optional. True, if the bot can transfer and upgrade gifts owned by the business account
+  can_transfer_stars: true; // Optional. True, if the bot can transfer Telegram Stars received by the business account to its own account, or use them to upgrade and transfer gifts
+  can_manage_stories: true; // Optional. True, if the bot can post, edit and delete stories on behalf of the business account
+};
+
+export type BusinessConnection = {
+  id: string;
+  user: User;
+  user_chat_id: number;
+  date: number;
+  rights?: BusinessBotRights;
+  is_enabled: boolean;
+};
+
+export type BusinessMessagesDeleted = {
+  business_connection_id: string; // Unique identifier of the business connection
+  chat: Chat; // Information about a chat in the business account. The bot may not have access to the chat or the corresponding user.
+  message_ids: number[]; // The list of identifiers of deleted messages in the chat of the business account
+};
+
+export type ReactionTypeEmoji = {
+  type: 'emoji';
+  emoji: string;
+};
+
+export type ReactionTypeCustomEmoji = {
+  type: 'custom_emoji';
+  custom_emoji_id: string;
+};
+
+export type ReactionTypePaid = {
+  type: 'paid';
+};
+
+export type ReactionType = ReactionTypeEmoji | ReactionTypeCustomEmoji | ReactionTypePaid;
+
+export type MessageReactionUpdated = {
+  chat: Chat; // The chat containing the message the user reacted to
+  message_id: number; // Unique identifier of the message inside the chat
+  user?: User; // Optional. The user that changed the reaction, if the user isn't anonymous
+  actor_chat?: Chat; // Optional. The chat on behalf of which the reaction was changed, if the user is anonymous
+  date: number; // Date of the change in Unix time
+  old_reaction: ReactionType[]; // Previous list of reaction types that were set by the user
+  new_reaction: ReactionType[]; // New list of reaction types that have been set by the user
+};
+
+export type ReactionCount = {
+  type: ReactionType; // Type of the reaction
+  total_count: number; // Number of times the reaction was added
+};
+
+export type MessageReactionCountUpdated = {
+  chat: Chat; // The chat containing the message
+  message_id: number; // Unique message identifier inside the chat
+  date: number; // Date of the change in Unix time
+  reactions: ReactionCount[]; // List of reactions that are present on the message
+};
+
+export type InlineQuery = {
+  from: User; // Sender
+  query: string; // Text of the query (up to 256 characters)
+  offset: string; // Offset of the results to be returned, can be controlled by the bot
+  chat_type?: string; // Optional. Type of the chat from which the inline query was sent. Can be either “sender” for a private chat with the inline query sender, “private”, “group”, “supergroup”, or “channel”. The chat type should be always known for requests sent from official clients and most third-party clients, unless the request was sent from a secret chat
+  location?: Location; // Optional. Sender location, only for bots that request user location
+};
+
+export type ChosenInlineResult = {
+  result_id: string; // The unique identifier for the result that was chosen
+  from: User; // The user that chose the result
+  location: Location; // Optional. Sender location, only for bots that require user location
+  inline_message_id: string; // Optional. Identifier of the sent inline message. Available only if there is an inline keyboard attached to the message. Will be also received in callback queries and can be used to edit the message.
+  query: string; // The query that was used to obtain the result
+};
+
+export type ShippingQuery = {
+  id: string; // Unique query identifier
+  from: User; // User who sent the query
+  invoice_payload: string; // Bot-specified invoice payload
+  shipping_address: ShippingAddress; // User specified shipping address
+};
+
+export type PreCheckoutQuery = {
+  id: string; // Unique query identifier
+  from: User; // User who sent the query
+  currency: string; // Three-letter ISO 4217 currency code, or “XTR” for payments in Telegram Stars
+  total_amount: number; // Total price in the smallest units of the currency (integer, not float/double). For example, for a price of US$ 1.45 pass amount = 145. See the exp parameter in currencies.json, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).
+  invoice_payload: string; // Bot-specified invoice payload
+  shipping_option_id?: string; // Optional. Identifier of the shipping option chosen by the user
+  order_info?: OrderInfo; // Optional. Order information provided by the user
+};
+
+export type PaidMediaPurchased = {
+  from: User; // User who purchased the media
+  paid_media_payload: string; // Bot-specified paid media payload
+};
+
+export type PollOption = {
+  text: string; // Option text, 1-100 characters
+  text_entities: MessageEntity[]; // Optional. Special entities that appear in the option text. Currently, only custom emoji entities are allowed in poll option texts
+  voter_count: number; // Number of users that voted for this option
+};
+
+export type Poll = {
+  id: string; // Unique poll identifier
+  question: string; // Poll question, 1-300 characters
+  question_entities?: MessageEntity[]; // Optional. Special entities that appear in the question. Currently, only custom emoji entities are allowed in poll questions
+  options: PollOption[]; // List of poll options
+  total_voter_count: number; // Total number of users that voted in the poll
+  is_closed: boolean; // True, if the poll is closed
+  is_anonymous: boolean; // True, if the poll is anonymous
+  type: 'regular' | 'quiz'; // Poll type, currently can be “regular” or “quiz”
+  allows_multiple_answers: boolean; // True, if the poll allows multiple answers
+  correct_option_id?: number; // Optional. 0-based identifier of the correct answer option. Available only for polls in the quiz mode, which are closed, or was sent (not forwarded) by the bot or to the private chat with the bot.
+  explanation?: string; // Optional. Text that is shown when a user chooses an incorrect answer or taps on the lamp icon in a quiz-style poll, 0-200 characters
+  explanation_entities?: MessageEntity[]; // Optional. Special entities like usernames, URLs, bot commands, etc. that appear in the explanation
+  open_period?: number; // Optional. Amount of time in seconds the poll will be active after creation
+  close_date?: number; // Optional. Point in time (Unix timestamp) when the poll will be automatically closed
+};
+
+export type PollAnswer = {
+  poll_id: string; // Unique poll identifier
+  voter_chat?: Chat; // Optional. The chat that changed the answer to the poll, if the voter is anonymous
+  user?: User; // Optional. The user that changed the answer to the poll, if the voter isn't anonymous
+  option_ids: number[]; // 0-based identifiers of chosen answer options. May be empty if the vote was retracted.
+};
+
+export type ChatMemberUpdated = {
+  poll_id: string; // Unique poll identifier
+  voter_chat?: Chat; // Optional. The chat that changed the answer to the poll, if the voter is anonymous
+  user?: User; // Optional. The user that changed the answer to the poll, if the voter isn't anonymous
+  option_ids: number[]; // 0-based identifiers of chosen answer options. May be empty if the vote was retracted.
+};
+
+export type ChatInviteLink = {
+  invite_link: string; // The invite link. If the link was created by another chat administrator, then the second part of the link will be replaced with “…”.
+  creator: User; // Creator of the link
+  creates_join_request: boolean; // True, if users joining the chat via the link need to be approved by chat administrators
+  is_primary: boolean; // True, if the link is primary
+  is_revoked: boolean; // True, if the link is revoked
+  name?: string; // Optional. Invite link name
+  expire_date?: number; // Optional. Point in time (Unix timestamp) when the link will expire or has been expired
+  member_limit?: number; // Optional. The maximum number of users that can be members of the chat simultaneously after joining the chat via this invite link; 1-99999
+  pending_join_request_count?: number; // Optional. Number of pending join requests created using this link
+  subscription_period?: number; // Optional. The number of seconds the subscription will be active for before the next payment
+  subscription_price?: number; // Optional. The amount of Telegram Stars a user must pay initially and after each subsequent subscription period to be a member of the chat using the link
+};
+
+export type ChatJoinRequest = {
+  chat: Chat; // Chat to which the request was sent
+  from: User; // User that sent the join request
+  user_chat_id: number; // Identifier of a private chat with the user who sent the join request. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a 64-bit integer or double-precision float type are safe for storing this identifier. The bot can use this identifier for 5 minutes to send messages until the join request is processed, assuming no other administrator contacted the user.
+  date: number; // Date the request was sent in Unix time
+  bio?: string; // Optional. Bio of the user.
+  invite_link?: ChatInviteLink; // Optional. Chat invite link that was used by the user to send the join request
+};
+
+export type ChatBoostSourcePremium = {
+  source: 'premium'; // Source of the boost, always “premium”
+  user: User; // User that boosted the chat
+};
+
+export type ChatBoostSourceGiftCode = {
+  source: 'gift_code'; // Source of the boost, always “gift_code”
+  user: User; // User for which the gift code was created
+};
+
+export type ChatBoostSourceGiveaway = {
+  source: 'giveaway'; // Source of the boost, always “giveaway”
+  giveaway_message_id: number; // Identifier of a message in the chat with the giveaway; the message could have been deleted already. May be 0 if the message isn't sent yet.
+  user?: User; // Optional. User that won the prize in the giveaway if any; for Telegram Premium giveaways only
+  prize_star_count?: number; // Optional. The number of Telegram Stars to be split between giveaway winners; for Telegram Star giveaways only
+  is_unclaimed?: true; // Optional. True, if the giveaway was completed, but there was no user to win the prize
+};
+
+export type ChatBoostSource = ChatBoostSourcePremium | ChatBoostSourceGiftCode | ChatBoostSourceGiveaway;
+
+export type ChatBoost = {
+  boost_id: string; // Unique identifier of the boost
+  add_date: number; // Point in time (Unix timestamp) when the chat was boosted
+  expiration_date: number; // Point in time (Unix timestamp) when the boost will automatically expire, unless the booster's Telegram Premium subscription is prolonged
+  source: ChatBoostSource; // Source of the added boost
+};
+
+export type ChatBoostUpdated = {
+  chat: Chat; // Chat which was boosted
+  boost: ChatBoost; // Information about the chat boost
+};
+
+export type ChatBoostRemoved = {
+  chat: Chat; // Chat which was boosted
+  boost_id: string; // Unique identifier of the boost
+  remove_date: number; // Point in time (Unix timestamp) when the boost was removed
+  source: ChatBoostSource; // Source of the removed boost
+};
+
+export type ChecklistTask = {
+  text: string; // Text of the task
+  text_entities: MessageEntity[]; // Optional. Special entities that appear in the task text
+  completed_by_user: User; // Optional. User that completed the task; omitted if the task wasn't completed
+  completion_date: number; // Optional. Point in time (Unix timestamp) when the task was completed; 0 if the task wasn't completed
+};
+
+export type Checklist = {
+  title: string; // Title of the checklist
+  title_entities?: MessageEntity[]; // Optional. Special entities that appear in the checklist title
+  tasks: ChecklistTask[]; // List of tasks in the checklist
+  others_can_add_tasks?: true; // Optional. True, if users other than the creator of the list can add tasks to the list
+  others_can_mark_tasks_as_done?: true; // Optional. True, if users other than the creator of the list can mark tasks as done or not done
+};
+
+export type ExternalReplyInfo = {
+  origin: MessageOrigin; // Origin of the message replied to by the given message
+  chat?: Chat; // Optional. Chat the original message belongs to. Available only if the chat is a supergroup or a channel.
+  message_id?: number; // Optional. Unique message identifier inside the original chat. Available only if the original chat is a supergroup or a channel.
+  link_preview_options?: LinkPreviewOptions; // Optional. Options used for link preview generation for the original message, if it is a text message
+  animation?: Animation; // Optional. Message is an animation, information about the animation
+  audio?: Audio; // Optional. Message is an audio file, information about the file
+  document?: Document; // Optional. Message is a general file, information about the file
+  paid_media?: PaidMediaInfo; // Optional. Message contains paid media; information about the paid media
+  photo?: PhotoSize[]; // Optional. Message is a photo, available sizes of the photo
+  sticker?: Sticker; // Optional. Message is a sticker, information about the sticker
+  story?: Story; // Optional. Message is a forwarded story
+  video?: Video; // Optional. Message is a video, information about the video
+  video_note?: VideoNote; // Optional. Message is a video note, information about the video message
+  voice?: Voice; // Optional. Message is a voice message, information about the file
+  has_media_spoiler?: true; // Optional. True, if the message media is covered by a spoiler animation
+  checklist?: Checklist; // Optional. Message is a checklist
+  contact?: Contact; // Optional. Message is a shared contact, information about the contact
+  dice?: Dice; // Optional. Message is a dice with random value
+  game?: Game; // Optional. Message is a game, information about the game. More about games »
+  giveaway?: Giveaway; // Optional. Message is a scheduled giveaway, information about the giveaway
+  giveaway_winners?: GiveawayWinners; // Optional. A giveaway with public winners was completed
+  invoice?: Invoice; // Optional. Message is an invoice for a payment, information about the invoice. More about payments »
+  location?: Location; // Optional. Message is a shared location, information about the location
+  poll?: Poll; // Optional. Message is a native poll, information about the poll
+  venue?: Venue; // Optional. Message is a venue, information about the venue
+};
+
+export type EncryptedCredentials = {
+  data: string; // Base64-encoded encrypted JSON-serialized data with unique user's payload, data hashes and secrets required for EncryptedPassportElement decryption and authentication
+  hash: string; // Base64-encoded data hash for data authentication
+  secret: string; // Base64-encoded secret, encrypted with the bot's public RSA key, required for data decryption
+};
+
+export type PassportFile = {
+  file_id: string; // Identifier for this file, which can be used to download or reuse the file
+  file_unique_id: string; // Unique identifier for this file, which is supposed to be the same over time and for different bots. Can't be used to download or reuse the file.
+  file_size: number; // File size in bytes
+  file_date: number; // Unix time when the file was uploaded
+};
+
+export type EncryptedPassportElement = {
+  type: string; // Element type. One of “personal_details”, “passport”, “driver_license”, “identity_card”, “internal_passport”, “address”, “utility_bill”, “bank_statement”, “rental_agreement”, “passport_registration”, “temporary_registration”, “phone_number”, “email”.
+  data?: string; // Optional. Base64-encoded encrypted Telegram Passport element data provided by the user; available only for “personal_details”, “passport”, “driver_license”, “identity_card”, “internal_passport” and “address” types. Can be decrypted and verified using the accompanying EncryptedCredentials.
+  phone_number?: string; // Optional. User's verified phone number; available only for “phone_number” type
+  email?: string; // Optional. User's verified email address; available only for “email” type
+  files?: PassportFile[]; // Optional. Array of encrypted files with documents provided by the user; available only for “utility_bill”, “bank_statement”, “rental_agreement”, “passport_registration” and “temporary_registration” types. Files can be decrypted and verified using the accompanying EncryptedCredentials.
+  front_side?: PassportFile; // Optional. Encrypted file with the front side of the document, provided by the user; available only for “passport”, “driver_license”, “identity_card” and “internal_passport”. The file can be decrypted and verified using the accompanying EncryptedCredentials.
+  reverse_side?: PassportFile; // Optional. Encrypted file with the reverse side of the document, provided by the user; available only for “driver_license” and “identity_card”. The file can be decrypted and verified using the accompanying EncryptedCredentials.
+  selfie?: PassportFile; // Optional. Encrypted file with the selfie of the user holding a document, provided by the user; available if requested for “passport”, “driver_license”, “identity_card” and “internal_passport”. The file can be decrypted and verified using the accompanying EncryptedCredentials.
+  translation?: PassportFile[]; // Optional. Array of encrypted files with translated versions of documents provided by the user; available if requested for “passport”, “driver_license”, “identity_card”, “internal_passport”, “utility_bill”, “bank_statement”, “rental_agreement”, “passport_registration” and “temporary_registration” types. Files can be decrypted and verified using the accompanying EncryptedCredentials.
+  hash: string; // Base64-encoded element hash for using in PassportElementErrorUnspecified
+};
+
+export type PassportData = {
+  data: EncryptedPassportElement[]; // Array with information about documents and other Telegram Passport elements that was shared with the bot
+  credentials: EncryptedCredentials; // Encrypted credentials required to decrypt the data
+};
+
+export type ProximityAlertTriggered = {
+  traveler: User; // User that triggered the alert
+  watcher: User; // User that set the alert
+  distance: number; // The distance between the users
+};
+
+export type ChatBoostAdded = {
+  boost_count: number; // Number of boosts added by the user
+};
+
+export type BackgroundFillSolid = {
+  type: 'solid'; // Type of the background fill, always “solid”
+  color: number; // The color of the background fill in the RGB24 format
+};
+
+export type BackgroundFillGradient = {
+  type: 'gradient'; // Type of the background fill, always “gradient”
+  top_color: number; // Top color of the gradient in the RGB24 format
+  bottom_color: number; // Bottom color of the gradient in the RGB24 format
+  rotation_angle: number; // Clockwise rotation angle of the background fill in degrees; 0-359
+};
+
+export type BackgroundFillFreeformGradient = {
+  type: 'freeform_gradient'; // Type of the background fill, always “freeform_gradient”
+  colors: number[]; // A list of the 3 or 4 base colors that are used to generate the freeform gradient in the RGB24 format
+};
+
+export type BackgroundFill = BackgroundFillSolid | BackgroundFillGradient | BackgroundFillFreeformGradient;
+
+export type BackgroundTypeFill = {
+  type: 'fill'; // Type of the background, always “fill”
+  fill: BackgroundFill; // The background fill
+  dark_theme_dimming: number; // Dimming of the background in dark themes, as a percentage; 0-100
+};
+
+export type BackgroundTypeWallpaper = {
+  type: 'wallpaper'; // Type of the background, always “wallpaper”
+  document: Document; // Document with the wallpaper
+  dark_theme_dimming: number; // Dimming of the background in dark themes, as a percentage; 0-100
+  is_blurred?: true; // Optional. True, if the wallpaper is downscaled to fit in a 450x450 square and then box-blurred with radius 12
+  is_moving?: true; // Optional. True, if the background moves slightly when the device is tilted
+};
+
+export type BackgroundTypePattern = {
+  type: 'pattern'; // Type of the background, always “pattern”
+  document: Document; // Document with the pattern
+  fill: BackgroundFill; // The background fill that is combined with the pattern
+  intensity: number; // Intensity of the pattern when it is shown above the filled background; 0-100
+  is_inverted?: true; // Optional. True, if the background fill must be applied only to the pattern itself. All other pixels are black in this case. For dark themes only
+  is_moving?: true; // Optional. True, if the background moves slightly when the device is tilted
+};
+
+export type BackgroundType = BackgroundTypeFill | BackgroundTypeWallpaper| BackgroundTypePattern;
+
+export type ChatBackground = {
+  type: BackgroundType; // Type of the background
+};
+
+export type ForumTopicCreated = {
+  name: string; // Name of the topic
+  icon_color: number; // Color of the topic icon in RGB format
+  icon_custom_emoji_id?: string; // Optional. Unique identifier of the custom emoji shown as the topic icon
+};
+
+export type ForumTopicEdited = {
+  name?: string; // Optional. New name of the topic, if it was edited
+  icon_custom_emoji_id?: string; // Optional. New identifier of the custom emoji shown as the topic icon, if it was edited; an empty string if the icon was removed
+};
+
+export type ForumTopicClosed = {};
+export type ForumTopicReopened = {};
+export type GeneralForumTopicHidden = {};
+export type GeneralForumTopicUnhidden = {};
+
+export type GiveawayCreated = {
+  prize_star_count?: number; // Optional. The number of Telegram Stars to be split between giveaway winners; for Telegram Star giveaways only
+};
+
+export type Giveaway = {
+  chats: Chat[]; // The list of chats which the user must join to participate in the giveaway
+  winners_selection_date: number; // Point in time (Unix timestamp) when winners of the giveaway will be selected
+  winner_count: number; // The number of users which are supposed to be selected as winners of the giveaway
+  only_new_members?: true; // Optional. True, if only users who join the chats after the giveaway started should be eligible to win
+  has_public_winners?: true; // Optional. True, if the list of giveaway winners will be visible to everyone
+  prize_description?: string; // Optional. Description of additional giveaway prize
+  country_codes?: string[]; // Optional. A list of two-letter ISO 3166-1 alpha-2 country codes indicating the countries from which eligible users for the giveaway must come. If empty, then all users can participate in the giveaway. Users with a phone number that was bought on Fragment can always participate in giveaways.
+  prize_star_count?: number; // Optional. The number of Telegram Stars to be split between giveaway winners; for Telegram Star giveaways only
+  premium_subscription_month_count?: number; // Optional. The number of months the Telegram Premium subscription won from the giveaway will be active for; for Telegram Premium giveaways only
+};
+
+export type GiveawayWinners = {
+  chat: Chat; // The chat that created the giveaway
+  giveaway_message_id: number; // Identifier of the message with the giveaway in the chat
+  winners_selection_date: number; // Point in time (Unix timestamp) when winners of the giveaway were selected
+  winner_count: number; // Total number of winners in the giveaway
+  winners: User[]; // List of up to 100 winners of the giveaway
+  additional_chat_count?: number; // Optional. The number of other chats the user had to join in order to be eligible for the giveaway
+  prize_star_count?: number; // Optional. The number of Telegram Stars that were split between giveaway winners; for Telegram Star giveaways only
+  premium_subscription_month_count?: number; // Optional. The number of months the Telegram Premium subscription won from the giveaway will be active for; for Telegram Premium giveaways only
+  unclaimed_prize_count?: number; // Optional. Number of undistributed prizes
+  only_new_members?: true; // Optional. True, if only users who had joined the chats after the giveaway started were eligible to win
+  was_refunded?: true; // Optional. True, if the giveaway was canceled because the payment for it was refunded
+  prize_description?: string; // Optional. Description of additional giveaway prize
+};
+
+export type GiveawayCompleted = {
+  winner_count: number; // Number of winners in the giveaway
+  unclaimed_prize_count?: number; // Optional. Number of undistributed prizes
+  giveaway_message?: Message; // Optional. Message with the giveaway that was completed, if it wasn't deleted
+  is_star_giveaway?: true; // Optional. True, if the giveaway is a Telegram Star giveaway. Otherwise, currently, the giveaway is a Telegram Premium giveaway.
+};
+
+export type VideoChatScheduled = {
+  start_date: number; // Point in time (Unix timestamp) when the video chat is supposed to be started by a chat administrator
+};
+
+export type VideoChatStarted = {};
+
+export type VideoChatEnded = {
+  duration: number; // Video chat duration in seconds
+};
+
+export type VideoChatParticipantsInvited = {
+  users: User[]; // New members that were invited to the video chat
+};
+
+export type WebAppData = {
+  data: string; // The data. Be aware that a bad client can send arbitrary data in this field.
+  button_text: string; // Text of the web_app keyboard button from which the Web App was opened. Be aware that a bad client can send arbitrary data in this field.
+};
+
+export type CallbackGame = any;
 
 export type MessageUpdate = {
   update_id: number;
