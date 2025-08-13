@@ -29,6 +29,20 @@ type Method = {
   copyMessages: [Out.CopyMessagesData, Out.MessageId[]];
   sendPhoto: [Out.SendPhotoData, Message];
   sendAudio: [Out.SendAudioData, Message];
+  sendDocument: [Out.SendDocumentData, Message],
+  sendVideo: [Out.SendVideoData, Message],
+  sendAnimation: [Out.SendAnimationData, Message],
+  sendVoice: [Out.SendVoiceData, Message],
+  sendVideoNote: [Out.SendVideoNoteData, Message],
+  sendPaidMedia: [Out.SendPaidMediaData, Message],
+  sendMediaGroup: [Out.SendMediaGroupData, Message[]],
+  sendLocation: [Out.SendLocationData, Message],
+  sendVenue: [Out.SendVenueData, Message],
+  sendContact: [Out.SendContactData, Message],
+  sendPoll: [Out.SendPollData, Message],
+  sendChecklist: [Out.SendChecklistData, Message],
+  sendDice: [Out.SendDiceData, Message],
+  sendChatAction: [Out.SendChatActionData, true],
 };
 type MethodNoRequestData = {
   [K in keyof Method as Method[K][0] extends void ? K : never]: Method[K];

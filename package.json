@@ -5,11 +5,13 @@
   "main": "build/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc"
+    "build": "tsc",
+    "parse": "node ./bin/api-parser.js"
   },
   "bin": {
     "webhook": "./bin/webhook.js",
-    "botyscaphe-launch": "./bin/botyscaphe-launch.js"
+    "botyscaphe-launch": "./bin/botyscaphe-launch.js",
+    "parse": "./bin/api-parser.js"
   },
   "repository": {
     "type": "git",
