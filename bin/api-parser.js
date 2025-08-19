@@ -15,6 +15,7 @@ const NEW_LINE_SYMBOLS = {
   ' ': null,
   '-': null,
 };
+const VOID_TYPE = /Requires no parameters\./;
 const METHOD_SEPARATOR_RE = /-{5,}\n/;
 const STRING_VARIANTS_RE = [
   /\. Currently, (?:it can be one of |can be |either )((?:“\w+”(?:(?: \([^\)]+\)| for [^,]+)?)(?:, )?(?:or )?)+)/,
@@ -22,6 +23,9 @@ const STRING_VARIANTS_RE = [
 ];
 const STRING_VARIANT_RE = /, (?:must be |always )(one of )?(“?[\w\/]+”?|“”)/;
 const INTEGER_VARIANTS_RE = /(?:;|,) must be (?:one of )?((?:(?:, or |, and |, )?(?:\d+)( \* \d+| \([^\)]+\)| for [^,]+)?)+)/;
+const PREFIX = {
+  METHOD_DATA: '',
+};
 
 const TYPE_MAP = {
   Int: 'Integer',
@@ -178,10 +182,13 @@ function parse(data) {
   let currentLine = lines.shift();
   let result = '';
   let returns = '';
-  let isList = undefined;
+  let dataType = 'INIT';
 
   while (currentLine) {
     returns = extractReturnType(currentLine, returns);
+    if (dataType === 'INIT' && VOID_TYPE.test(currentLine)) {
+      dataType = 'VOID';
+    }
     description += (description ? '\n' : '') + '* ' + shorten(currentLine, DESCRIPTION_LENGTH).join('\n* ');
     currentLine = lines.shift();
   }
@@ -189,15 +196,15 @@ function parse(data) {
   lines.forEach(function (line) {
     if (line) {
       const match = LINE_RE.exec(line);
-      const isListCurrently = !!match[1];
+      const currentDataType = !!match[1] ? 'LIST' : 'OBJECT';
 
-      if (isList === undefined) {
-        isList = isListCurrently;
-      } else if (isList !== isListCurrently) {
+      if (dataType === 'INIT') {
+        dataType = currentDataType;
+      } else if (dataType !== currentDataType) {
         throw new Error('Unexpectet switch between List and Table in ' + method);
       }
 
-      if (isList) {
+      if (dataType === 'LIST') {
         result += (result ? ' | ' : '') + match[1];
       } else {
         const isOptional = match[4] === 'Optional' || (match[5].substring(0, 9) === 'Optional.');
@@ -206,11 +213,22 @@ function parse(data) {
     }
   });
 
-  if (isList && result.length > DESCRIPTION_LENGTH) {
+  if (dataType === 'LIST' && result.length > DESCRIPTION_LENGTH) {
     result = result.replace(/ \| /g, ' |\n  ');
   }
 
-  result = isList ? `export type ${typeName} = ${result};\n\n` : `export type ${typeName} = {${result ? `\n${result}` : ''}};\n\n`;
+  switch (dataType) {
+    case 'LIST':
+      result = `export type ${typeName} = ${result};\n\n`;
+      break;
+    case 'VOID':
+      result = `export type ${typeName} = void;\n\n`;
+      break;
+    case 'OBJECT':
+    default:
+      result = `export type ${typeName} = {${result ? `\n${result}` : ''}};\n\n`;
+      break;
+  }
 
   if (description) {
     result = `/**\n${description}\n*/\n${result}`;
@@ -218,7 +236,7 @@ function parse(data) {
 
   return {
     type: result,
-    method: typeName === method ? '' : `${method}: [Out.${typeName}, ${returns}]`,
+    method: typeName === method ? '' : `${method}: [${PREFIX.METHOD_DATA}${typeName}, ${returns}]`,
   };
 }
 
@@ -255,7 +273,7 @@ fs.readFile(FILE).catch(function () {
   let result = {
     types: '',
     methodTypes: '',
-    methods: 'export type METHODS = {\n',
+    methods: 'export type Method = {\n',
   };
 
   while (regMatch = PART_RE.exec(data)) {
@@ -274,5 +292,5 @@ fs.readFile(FILE).catch(function () {
   }
 
   result.methods += '};';
-  console.log([result.types, result.methodTypes, result.methods].join('----------------------------\n'));
+  console.log([result.types, result.methodTypes, result.methods].join('// ----------------------------\n'));
 });

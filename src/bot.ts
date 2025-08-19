@@ -1,7 +1,8 @@
 import type { IncomingMessage } from 'http';
 import https from 'https';
-import type { Message, Update, User } from './types.in';
-import type * as Out from './types.out';
+import type { Update, Method } from './types';
+import * as Type from './types';
+import type { TGBotResponse } from './types.common';
 
 import { validateRequest, collectData } from './utils';
 import { API_HOST } from './constants';
@@ -9,40 +10,6 @@ import { API_HOST } from './constants';
 type Options = {
   secret?: string;
   token: string;
-};
-
-type Method = {
-  getMe: [void, User];
-  logOut: [void, true];
-  close: [void, true];
-  sendMessage: [Out.SendMessageData, Message];
-  editMessageText: [Out.EditMessageTextData, Message | true];
-  editMessageReplyMarkup: [Out.EditMessageReplyMarkupData, Message | true];
-  setMyCommands: [Out.SetMyCommandsData, true];
-  deleteMyCommands: [Out.DeleteMyCommandsData, true];
-  getMyCommands: [Out.GetMyCommandsData, Out.BotCommand[]];
-  setChatMenuButton: [Out.SetChatMenuButtonData, true];
-  getChatMenuButton: [Out.GetChatMenuButtonData, Out.MenuButton];
-  forwardMessage: [Out.ForwardMessageData, Message];
-  forwardMessages: [Out.ForwardMessagesData, Out.MessageId[]];
-  copyMessage: [Out.CopyMessageData, Out.MessageId];
-  copyMessages: [Out.CopyMessagesData, Out.MessageId[]];
-  sendPhoto: [Out.SendPhotoData, Message];
-  sendAudio: [Out.SendAudioData, Message];
-  sendDocument: [Out.SendDocumentData, Message],
-  sendVideo: [Out.SendVideoData, Message],
-  sendAnimation: [Out.SendAnimationData, Message],
-  sendVoice: [Out.SendVoiceData, Message],
-  sendVideoNote: [Out.SendVideoNoteData, Message],
-  sendPaidMedia: [Out.SendPaidMediaData, Message],
-  sendMediaGroup: [Out.SendMediaGroupData, Message[]],
-  sendLocation: [Out.SendLocationData, Message],
-  sendVenue: [Out.SendVenueData, Message],
-  sendContact: [Out.SendContactData, Message],
-  sendPoll: [Out.SendPollData, Message],
-  sendChecklist: [Out.SendChecklistData, Message],
-  sendDice: [Out.SendDiceData, Message],
-  sendChatAction: [Out.SendChatActionData, true],
 };
 type MethodNoRequestData = {
   [K in keyof Method as Method[K][0] extends void ? K : never]: Method[K];
@@ -79,7 +46,7 @@ export class Bot {
   send<T = any> (action: string, message: string) {
     const path = `/bot${this.options.token}/${action}`;
 
-    return new Promise<Out.TGBotResponse<T>>(function (resolve, reject) {
+    return new Promise<TGBotResponse<T>>(function (resolve, reject) {
       https.request({
         hostname: API_HOST,
         method: 'POST',
@@ -90,7 +57,7 @@ export class Bot {
         }
       }, function (response) {
         collectData(response).then(function (data) {
-          const responseData: Out.TGBotResponse = JSON.parse(data.toString());
+          const responseData: TGBotResponse = JSON.parse(data.toString());
           if (responseData.ok) {
             resolve(responseData);
           } else {
@@ -104,22 +71,22 @@ export class Bot {
   }
 
   useMethod<K extends keyof MethodNoRequestData> (action: K):
-    Promise<Out.TGBotResponse<MethodNoRequestData[K][1]>>;
+    Promise<TGBotResponse<MethodNoRequestData[K][1]>>;
   useMethod<K extends keyof MethodWithRequestData> (action: K, message: MethodWithRequestData[K][0]):
-    Promise<Out.TGBotResponse<MethodWithRequestData[K][1]>>;
+    Promise<TGBotResponse<MethodWithRequestData[K][1]>>;
   useMethod<K extends keyof Method> (action: K, message?: Method[K][0]) {
     return this.send<Method[K][1]>(action, message ? JSON.stringify(message) : '');
   }
 
-  sendMessage (message: Out.SendMessageData) {
+  sendMessage (message: Type.SendMessageData) {
     return this.useMethod('sendMessage', message);
   }
 
-  editMessageText (message: Out.EditMessageTextData) {
+  editMessageText (message: Type.EditMessageTextData) {
     return this.useMethod('editMessageText', message);
   }
 
-  editMessageReplyMarkup (message: Out.EditMessageReplyMarkupData) {
+  editMessageReplyMarkup (message: Type.EditMessageReplyMarkupData) {
     return this.useMethod('editMessageReplyMarkup', message);
   }
 }
