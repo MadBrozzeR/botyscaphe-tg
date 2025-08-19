@@ -7,7 +7,7 @@ const TELEGRAM_API_URL = 'https://core.telegram.org/bots/api';
 const FILE = process.argv[2];
 const METHOD_RE = /^(\w)(\w+)$/;
 const LINE_RE = /(^\w+$)|(?:(\w+)\t(.+?)(?:\t(\w+))?\t(.+))/;
-const TYPE_RE = /(Int\b|String|Boolean)|(?:((?:Array of )+)([\w ,]+?)$)/g;
+const TYPE_RE = /(Int\b|String|Boolean)|(?:(Array of )([\w ,]+?)$)/g;
 const OR_RE = / or /g;
 const RETURN_RE = /\. ?(?:On success, |Returns )(?:returns |if the .+?, |the .+? as |information .+? as |basic .+? of )?(?:the sent |the edited |the uploaded |the stopped |the |a )?(an [Aa]rray of )?(\w+)(?:.+?otherwise (\w+))?/;
 const DESCRIPTION_LENGTH = 98;
@@ -66,7 +66,6 @@ const VARIANT_TYPES = {
       STRING_VARIANTS_RE[1].exec(description);
 
     if (match) {
-      // console.log(match[0]);
       const variants = matchAll(match[1], /“(.+?)”/g, (regMatch) => regMatch[1]);
 
       return variants.map((variant) => `'${variant}'`).join(' | ');
@@ -128,21 +127,13 @@ function replaceTypes (raw, description) {
     }
 
     if (array) {
-      let arrayCount = arrayWords.split('Array of ').length - 1;
-      const content = (array.indexOf(' ') > -1) ? {
-        isComposite: true,
-        data: array.replace(/ and |, /g, ' | '),
-      } : {
-        isComposite: false,
-        data: array,
+      const data = replaceTypes(array.replace(/ and |, /g, ' | '));
+      const content = {
+        isComposite: (data.indexOf(' ') > -1),
+        data: data,
       };
-      let result = content.data;
 
-      while (arrayCount--) {
-        result = content.isComposite ? `Array<${result}>` : `${result}[]`;
-      }
-
-      return result;
+      return content.isComposite ? `Array<${content.data}>` : `${content.data}[]`;
     }
   });
 }
@@ -188,7 +179,6 @@ function parse(data) {
   let result = '';
   let returns = '';
   let isList = undefined;
-  // console.log(method, data);
 
   while (currentLine) {
     returns = extractReturnType(currentLine, returns);
@@ -199,7 +189,6 @@ function parse(data) {
   lines.forEach(function (line) {
     if (line) {
       const match = LINE_RE.exec(line);
-      // console.log(method, line, match[1]);
       const isListCurrently = !!match[1];
 
       if (isList === undefined) {
