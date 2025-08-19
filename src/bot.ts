@@ -43,7 +43,7 @@ export class Bot {
     });
   }
 
-  send<T = any> (action: string, message: string) {
+  sendRaw<T = any> (action: string, message: string) {
     const path = `/bot${this.options.token}/${action}`;
 
     return new Promise<TGBotResponse<T>>(function (resolve, reject) {
@@ -75,7 +75,7 @@ export class Bot {
   useMethod<K extends keyof MethodWithRequestData> (action: K, message: MethodWithRequestData[K][0]):
     Promise<TGBotResponse<MethodWithRequestData[K][1]>>;
   useMethod<K extends keyof Method> (action: K, message?: Method[K][0]) {
-    return this.send<Method[K][1]>(action, message ? JSON.stringify(message) : '');
+    return this.sendRaw<Method[K][1]>(action, message ? JSON.stringify(message) : '');
   }
 
   sendMessage (message: Type.SendMessageData) {

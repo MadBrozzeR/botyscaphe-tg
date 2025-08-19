@@ -28,7 +28,7 @@ function getParams (args) {
 
 const PARAMS = {
   method: process.argv[2],
-  data: process.argv[process.argv.length - 1],
+  data: process.argv[Math.max(process.argv.length - 1, 3)],
   params: getParams(process.argv),
 };
 
@@ -41,15 +41,16 @@ function getParamsFromJson () {
 }
 
 getParamsFromJson().then(function (botParams) {
+  const data = PARAMS.data || '';
   if (!METHOD_RE.test(PARAMS.method)) {
     throw new Error(`Method "${PARAMS.method}" is incorrect`);
   }
-  if (!DATA_RE.test(PARAMS.data)) {
-    throw new Error(`Submited data doesn't look like JSON:\n${PARAMS.data}`);
+  if (data && !DATA_RE.test(data)) {
+    throw new Error(`Submited data doesn't look like JSON:\n${data}`);
   }
   const token = botParams.token;
   const secret = botParams.secret;
   const bot = new TGBot({ token, secret });
 
-  bot.send(PARAMS.method, PARAMS.data).then(console.log).catch(console.error);
+  bot.sendRaw(PARAMS.method, data).then(console.log).catch(console.error);
 }).catch(console.error);
