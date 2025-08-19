@@ -16,6 +16,12 @@ const NEW_LINE_SYMBOLS = {
   '-': null,
 };
 const METHOD_SEPARATOR_RE = /-{5,}\n/;
+const STRING_VARIANTS_RE = [
+  /\. Currently, (?:it can be one of |can be |either )((?:“\w+”(?:(?: \([^\)]+\)| for [^,]+)?)(?:, )?(?:or )?)+)/,
+  /, (?:must be |currently )?(?:one of |can be |pass )(?:either )?((?:“[\w\/]+”(?: (?:for|if) [^,]+)?(?:, )?(?: ?or )?)+)/,
+];
+const STRING_VARIANT_RE = /, (?:must be |always )(one of )?(“?[\w\/]+”?|“”)/;
+const INTEGER_VARIANTS_RE = /(?:;|,) must be (?:one of )?((?:(?:, or |, and |, )?(?:\d+)( \* \d+| \([^\)]+\)| for [^,]+)?)+)/;
 
 const TYPE_MAP = {
   Int: 'Integer',
@@ -23,23 +29,50 @@ const TYPE_MAP = {
   Boolean: 'boolean',
 };
 
-const LITERAL_TYPES = {
+function matchAll (text, regExp, action) {
+  let match = null;
+  const result = [];
+
+  while (match = regExp.exec(text)) {
+    const current = action(match);
+    (current === undefined) || result.push(current);
+  }
+
+  return result;
+}
+
+const VARIANT_TYPES = {
   String (description) {
+    /* Variants:
+     * , one of “”, “”
+     * , pass “”, “”, or “”
+     * , can be either “”, “” or “”
+     * , must be one of “” for ..., “” for ...
+     * , must be one of “”, “”, or “”
+     * , must be one of “”, “”
+     * , currently can be “” or “”
+     * , currently one of “”, “”
+     * , currently one of “” for ..., “” for ...
+     * . Currently, can be “” (), “” ()
+     * . Currently, one of “” for ... or “” for ...
+     * . Currently, must be one of “” for ... or “” for ...
+     * . Currently, one of “” if ..., or “” if ...
+     * . Currently, it can be one of “”, “”
+     * . Currently, either “” for ..., “” for ..., or “” for ...
+     */
     let match =
-      /\. Currently, (?:can be |either )((?:“\w+”(?: \([^\)]+\)| for [^,]+)(?:, )?(?:or )?)+)/.exec(description) ||
-      /, (?:must be |currently )?(?:one of |can be )((?:“[\w\/]+”(?: for [^,]+)?(?:, )?(?:\s?or )?)+)/.exec(description);
+      // /(?:\. Currently, |, currently |, )(?:it can be |can be |must be |pass )?(?:one of |either )?((?:“\w+”(?:(?: \([^\)]+\)| for [^,]+)?)(?:, )?(?:or )?)+)/.exec(description);
+      STRING_VARIANTS_RE[0].exec(description) ||
+      STRING_VARIANTS_RE[1].exec(description);
 
     if (match) {
-      const variants = match[1]
-        .replace(/ \([^\)]+\)| for [^,]+/g, '')
-        .replace(/, or | or /g, ',')
-        .replace(/[”“ ]/g, '')
-        .split(',');
+      // console.log(match[0]);
+      const variants = matchAll(match[1], /“(.+?)”/g, (regMatch) => regMatch[1]);
 
       return variants.map((variant) => `'${variant}'`).join(' | ');
     }
 
-    match = /, (?:must be |always )(one of )?(“?[\w\/]+”?|“”)/.exec(description);
+    match = STRING_VARIANT_RE.exec(description);
 
     if (match && !match[1]) {
       return `'${match[2].replace(/[“”]/g, '')}'`;
@@ -48,14 +81,41 @@ const LITERAL_TYPES = {
     return null;
   },
 
+  Integer (description) {
+    /* Variants:
+     * . Currently, must be one of ... (), ... (), or ... ()
+     * ; must be one of ..., ..., or ...
+     * ; must be ... for ..., 1500 ..., and 2500 for ...
+     * ; must be one of ... * ..., ... * ..., ..., or ... * ...
+     */
+
+    const match = INTEGER_VARIANTS_RE.exec(description);
+
+    if (match) {
+      const purgedVariants = match[1].replace(/(?:(\d+) \* (\d+))| for [^,]+| \([^\)]+\)/g, function (_, multiplier1, multiplier2) {
+        if (multiplier1 && multiplier2) {
+          return parseInt(multiplier1, 10) * parseInt(multiplier2, 10);
+        }
+
+        return '';
+      });
+
+      return matchAll(purgedVariants, /\d+/g, match => match[0]).join(' | ');
+    }
+
+    return null;
+  },
+
+  /*
   'InlineKeyboardMarkup or ReplyKeyboardMarkup or ReplyKeyboardRemove or ForceReply' () {
     return 'ReplyMarkup';
   },
+  */
 };
 
 function replaceTypes (raw, description) {
-  if (description && raw in LITERAL_TYPES) {
-    const result = LITERAL_TYPES[raw](description);
+  if (description && raw in VARIANT_TYPES) {
+    const result = VARIANT_TYPES[raw](description);
 
     if (result) {
       return result;
@@ -161,7 +221,7 @@ function parse(data) {
     result = result.replace(/ \| /g, ' |\n  ');
   }
 
-  result = isList ? `export type ${typeName} = ${result};\n\n` : `export type ${typeName} = {\n${result}};\n\n`;
+  result = isList ? `export type ${typeName} = ${result};\n\n` : `export type ${typeName} = {${result ? `\n${result}` : ''}};\n\n`;
 
   if (description) {
     result = `/**\n${description}\n*/\n${result}`;
@@ -203,8 +263,11 @@ fs.readFile(FILE).catch(function () {
 }).then(function (data) {
   const content = data.toString();
   let regMatch = null;
-  let result = '';
-  let methods = 'export type METHODS = {\n';
+  let result = {
+    types: '',
+    methodTypes: '',
+    methods: 'export type METHODS = {\n',
+  };
 
   while (regMatch = PART_RE.exec(data)) {
     const data = `${regMatch[1]}\n` +
@@ -213,12 +276,14 @@ fs.readFile(FILE).catch(function () {
       `${regMatch[4] ? ('\n' + regMatch[4].replace(/<.+?>/g, '')) : ''}`;
 
     const parsed = parse(data);
-    result += parsed.type;
     if (parsed.method) {
-      methods += `  ${parsed.method},\n`;
+      result.methodTypes += parsed.type;
+      result.methods += `  ${parsed.method},\n`;
+    } else {
+      result.types += parsed.type;
     }
   }
 
-  methods += '};';
-  console.log(result + methods);
+  result.methods += '};';
+  console.log([result.types, result.methodTypes, result.methods].join('----------------------------\n'));
 });

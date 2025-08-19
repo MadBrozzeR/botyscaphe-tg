@@ -1,3 +1,4 @@
 node_modules
 .bot.json
 *.ignore.*
+bin/api-parser.js
