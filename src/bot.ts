@@ -15,6 +15,7 @@ type MethodNoRequestData = {
   [K in keyof Method as Method[K][0] extends void ? K : never]: Method[K];
 };
 type MethodWithRequestData = Omit<Method, keyof MethodNoRequestData>;
+type AllowedContentTypes = 'application/json' | 'application/x-www-form-urlencoded' | `multipart/form-data${string}`;
 
 export class Bot {
   options: Options;
@@ -43,7 +44,7 @@ export class Bot {
     });
   }
 
-  sendRaw<T = any> (action: string, message: string) {
+  sendRaw<T = any> (action: string, message: string, type: AllowedContentTypes = 'application/json') {
     const path = `/bot${this.options.token}/${action}`;
 
     return new Promise<TGBotResponse<T>>(function (resolve, reject) {
@@ -52,7 +53,7 @@ export class Bot {
         method: 'POST',
         path: path,
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': type,
           'Content-Length': Buffer.byteLength(message)
         }
       }, function (response) {
