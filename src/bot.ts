@@ -2,9 +2,9 @@ import type { IncomingMessage } from 'http';
 import https from 'https';
 import type { Update, Method } from './types';
 import * as Type from './types';
-import type { TGBotResponse } from './types.common';
+import type { TGBotResponse, AllowedContentTypes } from './types.common';
 
-import { validateRequest, collectData } from './utils';
+import { validateRequest, collectData, getBoundary, makeFormData } from './utils';
 import { API_HOST } from './constants';
 
 type Options = {
@@ -15,7 +15,6 @@ type MethodNoRequestData = {
   [K in keyof Method as Method[K][0] extends void ? K : never]: Method[K];
 };
 type MethodWithRequestData = Omit<Method, keyof MethodNoRequestData>;
-type AllowedContentTypes = 'application/json' | 'application/x-www-form-urlencoded' | `multipart/form-data${string}`;
 
 export class Bot {
   options: Options;
@@ -44,7 +43,7 @@ export class Bot {
     });
   }
 
-  sendRaw<T = any> (action: string, message: string, type: AllowedContentTypes = 'application/json') {
+  sendRaw<T = any> (action: string, message: string | Buffer, type: AllowedContentTypes = 'application/json') {
     const path = `/bot${this.options.token}/${action}`;
 
     return new Promise<TGBotResponse<T>>(function (resolve, reject) {
@@ -73,10 +72,29 @@ export class Bot {
 
   useMethod<K extends keyof MethodNoRequestData> (action: K):
     Promise<TGBotResponse<MethodNoRequestData[K][1]>>;
-  useMethod<K extends keyof MethodWithRequestData> (action: K, message: MethodWithRequestData[K][0]):
+  useMethod<K extends keyof MethodWithRequestData> (
+    action: K,
+    message: MethodWithRequestData[K][0],
+    type?: AllowedContentTypes
+  ):
     Promise<TGBotResponse<MethodWithRequestData[K][1]>>;
-  useMethod<K extends keyof Method> (action: K, message?: Method[K][0]) {
-    return this.sendRaw<Method[K][1]>(action, message ? JSON.stringify(message) : '');
+  useMethod<K extends keyof Method> (
+    action: K,
+    message?: Method[K][0],
+    type?: AllowedContentTypes
+  ) {
+    if (!type || type === 'application/json' || !message) {
+      return this.sendRaw<Method[K][1]>(action, message ? JSON.stringify(message) : '', type);
+    }
+
+    if (type === 'application/x-www-form-urlencoded') {
+      throw new Error(`Type ${type} is not yet supported`);
+    }
+
+    const boundary = getBoundary(type);
+    const data = makeFormData(message, boundary);
+
+    return this.sendRaw<Method[K][1]>(action, data, `multipart/form-data; boundary=${boundary}`);
   }
 
   sendMessage (message: Type.SendMessageData) {

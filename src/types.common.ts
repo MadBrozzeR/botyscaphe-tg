@@ -14,3 +14,4 @@ export type TGBotResponse<T = any> = {
   };
 };
 
+export type AllowedContentTypes = 'application/json' | 'application/x-www-form-urlencoded' | `multipart/form-data${string}`;
