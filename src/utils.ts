@@ -1,4 +1,5 @@
 import type { IncomingMessage } from 'http';
+import { File } from './file';
 
 export function validateRequest (request: IncomingMessage, secret?: string) {
   return request.method === 'POST'
@@ -24,6 +25,12 @@ export function collectData (request: IncomingMessage) {
   });
 }
 
+function isPrimitiveValue (value: any): value is string | number | boolean {
+  const type = typeof value;
+
+  return type === 'string' || type === 'boolean' || type === 'number';
+}
+
 function collectFormData<T extends {}> (
   data: T,
   name = '',
@@ -31,21 +38,29 @@ function collectFormData<T extends {}> (
 ) {
   for (const key in data) {
     const currentName = name ? `${name}[${key}]` : key;
+    const value = data[key];
 
-    if (data[key] instanceof Buffer) {
+    if (value instanceof File) {
+      result.push(Buffer.concat([
+        Buffer.from(`Content-Disposition: form-data; name="${currentName}"; filename="${value.name}"\r\n\r\n`),
+        value.data,
+      ]));
+    } else if (value instanceof Buffer) {
       result.push(Buffer.concat([
         Buffer.from(`Content-Disposition: form-data; name="${currentName}"\r\n\r\n`),
-        data[key],
+        value,
       ]));
-    } else if (data[key] instanceof Object) {
-      collectFormData(data[key], currentName, result)
-    } else if (typeof data[key] === 'string'){
-      result.push(Buffer.concat([
-        Buffer.from(`Content-Disposition: form-data; name="${currentName}"\r\n\r\n`),
-        Buffer.from(data[key]),
-      ]));
+    } else if (value instanceof Object) {
+      collectFormData(value, currentName, result)
     } else {
-      throw new Error(`Unknown data type for "${currentName}": ${typeof data[key]}`);
+      if (isPrimitiveValue(value)){
+        result.push(Buffer.concat([
+          Buffer.from(`Content-Disposition: form-data; name="${currentName}"\r\n\r\n`),
+          Buffer.from(value.toString()),
+        ]));
+      } else {
+        throw new Error(`Unknown data type for "${currentName}": ${typeof value}`);
+      }
     }
   }
 
@@ -80,6 +95,10 @@ export function makeFormData<T extends {}> (data: T, boundary: string) {
 
 const BOUNDARY_RE = /boundary=['"]?([^\s'";]+)['"]?/;
 
+export function generateBoundary () {
+  return '--MIMEBoundary-=-zZaaAbBccCdDZz-=-' + Date.now();
+}
+
 export function getBoundary (text: string) {
   const regMatch = BOUNDARY_RE.exec(text);
 
@@ -87,5 +106,5 @@ export function getBoundary (text: string) {
     return regMatch[1];
   }
 
-  return '--MIMEBoundary-=-zZaaAbBccCdDZz-=-' + Date.now();
+  return generateBoundary();
 }

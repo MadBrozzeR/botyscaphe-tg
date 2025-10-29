@@ -1,2 +1,3 @@
 export { Bot } from './bot';
-export * from './types';
+export type * from './types';
+export { File } from './file';

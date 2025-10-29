@@ -4,8 +4,9 @@ import type { Update, Method } from './types';
 import * as Type from './types';
 import type { TGBotResponse, AllowedContentTypes } from './types.common';
 
-import { validateRequest, collectData, getBoundary, makeFormData } from './utils';
+import { validateRequest, collectData, getBoundary, makeFormData, generateBoundary } from './utils';
 import { API_HOST } from './constants';
+import { File } from './file';
 
 type Options = {
   secret?: string;
@@ -83,8 +84,25 @@ export class Bot {
     message?: Method[K][0],
     type?: AllowedContentTypes
   ) {
-    if (!type || type === 'application/json' || !message) {
-      return this.sendRaw<Method[K][1]>(action, message ? JSON.stringify(message) : '', type);
+    type Result = Method[K][1];
+
+    if (!type) {
+      if (message && File.hasFiles(message)) {
+        const boundary = generateBoundary();
+        const type: AllowedContentTypes = `multipart/form-data;boundary=${boundary}`;
+        const data = makeFormData(message, boundary);
+
+        return this.sendRaw<Result>(action, data, type);
+      }
+
+      const type: AllowedContentTypes = 'application/json';
+      const data = JSON.stringify(message);
+
+      return this.sendRaw<Result>(action, data, type);
+    }
+
+    if (type === 'application/json' || !message) {
+      return this.sendRaw<Result>(action, message ? JSON.stringify(message) : '', type);
     }
 
     if (type === 'application/x-www-form-urlencoded') {
@@ -94,7 +112,7 @@ export class Bot {
     const boundary = getBoundary(type);
     const data = makeFormData(message, boundary);
 
-    return this.sendRaw<Method[K][1]>(action, data, `multipart/form-data; boundary=${boundary}`);
+    return this.sendRaw<Result>(action, data, `multipart/form-data; boundary=${boundary}`);
   }
 
   sendMessage (message: Type.SendMessageData) {
